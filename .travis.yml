@@ -1,3 +1,4 @@
+  #SSH: git@github.com:achour123/multi-docker.git
 sudo: required
 services:
   - docker
@@ -13,5 +14,21 @@ after_success:
   - docker build -t elyes1234/multi-server ./server
   - docker build -t elyes1234/multi-worker ./worker
   #log in to the docker CLI
-  
+  - echo "$DOCKER_PASSWORD" || docker login -u "$DOCKER_ID"
   # take those images and push them to docker hub
+  - docker push elyes1234/multi-client ./client
+  - docker push elyes1234/multi-ngnix ./ngnix
+  - docker push elyes1234/multi-server ./server
+  - docker push elyes1234/multi-worker ./worker
+
+  deploy:
+  provider: elasticbeanstalk
+  region: 'us-east-1' #depend on the region of my domaine
+  app: 'multi-docker'
+  env: 'MultiDocker-env'
+  bucket_name: 'elasticbeanstalk-us-east-1-923445559289'
+  bucket_path: 'docker-multi'
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
