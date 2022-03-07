@@ -1,0 +1,17 @@
+sudo: required
+services:
+  - docker
+before_install: 
+  - docker build -t elyes1234/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true elyes1234/react-test npm test
+
+after_success:
+  - docker build -t elyes1234/multi-client ./client
+  - docker build -t elyes1234/multi-ngnix ./ngnix
+  - docker build -t elyes1234/multi-server ./server
+  - docker build -t elyes1234/multi-worker ./worker
+  #log in to the docker CLI
+  
+  # take those images and push them to docker hub
